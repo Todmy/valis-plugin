@@ -1,0 +1,27 @@
+{
+  "description": "Valis — team decision intelligence hooks",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-start.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/capture-check.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

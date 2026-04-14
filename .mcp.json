@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "valis": {
+      "type": "http",
+      "url": "https://valis.krukit.co/api/mcp"
+    }
+  }
+}
