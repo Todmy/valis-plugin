@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Estimate token count for text files in a folder.
 # Outputs JSON: {"total_bytes": N, "file_count": N, "estimated_tokens": N, "range": "..."}
+#
+# Extensibility:
+#   VALIS_EXTRA_EXTENSIONS — space-separated additional globs (e.g. "*.vue *.svelte *.astro")
+#   VALIS_BYTES_PER_TOKEN  — override the bytes-per-token ratio (default: 4)
 
 set -euo pipefail
 
@@ -16,12 +20,22 @@ if [ ! -d "$FOLDER" ]; then
   exit 1
 fi
 
-# Supported text file extensions
+BYTES_PER_TOKEN="${VALIS_BYTES_PER_TOKEN:-4}"
+
+# Supported text file extensions (built-in set)
 EXTENSIONS=(
-  "*.md" "*.txt" "*.ts" "*.js" "*.py" "*.json" "*.yaml" "*.yml"
+  "*.md" "*.txt" "*.ts" "*.tsx" "*.js" "*.jsx" "*.py" "*.json" "*.yaml" "*.yml"
   "*.toml" "*.cfg" "*.ini" "*.sh" "*.html" "*.css" "*.sql"
   "*.go" "*.rs" "*.java" "*.rb" "*.php" "*.swift" "*.kt"
+  "*.vue" "*.svelte" "*.astro" "*.prisma" "*.graphql" "*.proto"
 )
+
+# Append user-supplied extensions (space-separated globs)
+if [ -n "${VALIS_EXTRA_EXTENSIONS:-}" ]; then
+  for ext in $VALIS_EXTRA_EXTENSIONS; do
+    EXTENSIONS+=("$ext")
+  done
+fi
 
 # Build find arguments
 FIND_ARGS=()
@@ -44,8 +58,8 @@ while IFS= read -r file; do
   fi
 done < <(find "$FOLDER" -type f \( "${FIND_ARGS[@]}" \))
 
-# Approximate tokens (1 token ~ 4 bytes)
-ESTIMATED_TOKENS=$((TOTAL_BYTES / 4))
+# Approximate tokens
+ESTIMATED_TOKENS=$((TOTAL_BYTES / BYTES_PER_TOKEN))
 
 # Determine range
 if [ "$ESTIMATED_TOKENS" -lt 10000 ]; then

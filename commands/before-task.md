@@ -1,34 +1,21 @@
 ---
-description: Load relevant team context before starting a task. Searches decisions by task description.
+description: Load relevant team context before starting a task.
 argument-hint: "task description"
 ---
 
-Load all relevant team decisions, constraints, and patterns before starting a new task.
+Load team decisions, constraints, and patterns relevant to a planned task.
 
 ## Steps
 
-1. **Get task description.** Use `$ARGUMENTS` as the task description. If empty, ask: "What task are you about to start?"
+1. Use `$ARGUMENTS` as the task description. If empty, ask: "What task are you about to start?"
 
-2. **Load context.** Call `valis_context` with `task_description` set to the provided text. This retrieves decisions, constraints, and patterns relevant to the planned work.
+2. Call `valis_context` with `task_description` set to the provided text.
 
-3. **Display relevant context.** Group results by type:
+3. Group results by type: **Decisions**, **Constraints**, **Patterns**, **Lessons**. Show summaries for each.
 
-   **Decisions:**
-   - {decision summaries with status}
-
-   **Constraints:**
-   - {constraint summaries — these MUST be respected}
-
-   **Patterns:**
-   - {established patterns to follow}
-
-   **Lessons:**
-   - {past lessons relevant to this work}
-
-4. **Flag conflicts.** If any existing decisions or constraints conflict with the planned task, highlight them clearly:
+4. If any existing decisions or constraints conflict with the planned task, flag them:
    ```
-   WARNING: Potential conflict with existing decision:
-   "{decision summary}" — {explain the conflict}
+   WARNING: Conflict with "{decision summary}" — {explanation}
    ```
 
-5. **Summarize.** End with a brief "Key things to keep in mind" list — the top 3-5 most important items from the loaded context that directly affect the planned task.
+5. End with "Key things to keep in mind" — top 3-5 items that directly affect this task.

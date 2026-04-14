@@ -4,14 +4,12 @@
 /**
  * Valis SessionStart hook
  *
- * Loads team decision context from the Valis API at session start.
- * Reads .valis.json from the project directory to determine project_id,
- * then fetches relevant context and injects it as additionalContext.
- *
+ * Reads .valis.json to find the project_id, fetches team context from
+ * the Valis API, and injects it as additionalContext.
  * Pure Node.js — zero external dependencies.
  */
 
-// Drain stdin first (hook protocol sends JSON context via stdin)
+// Drain stdin (hook protocol)
 process.stdin.resume();
 process.stdin.on("data", () => {});
 process.stdin.on("end", main);
@@ -19,7 +17,6 @@ process.stdin.on("error", () => process.exit(0));
 
 async function main() {
   try {
-    // 1. Locate and read .valis.json
     const fs = require("fs");
     const path = require("path");
 
@@ -28,39 +25,30 @@ async function main() {
 
     let config;
     try {
-      const raw = fs.readFileSync(configPath, "utf8");
-      config = JSON.parse(raw);
+      config = JSON.parse(fs.readFileSync(configPath, "utf8"));
     } catch {
-      // No .valis.json or invalid JSON — exit silently
       process.exit(0);
     }
 
     const { project_id } = config;
-    if (!project_id) {
-      process.exit(0);
-    }
+    if (!project_id) process.exit(0);
 
-    // 2. Fetch session context from Valis API
-    const url = `https://valis.krukit.co/api/session-context?project_id=${encodeURIComponent(project_id)}`;
-
+    // Fetch session context with 5s timeout
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
     let response;
     try {
-      response = await fetch(url, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-        signal: controller.signal,
-      });
+      response = await fetch(
+        `https://valis.krukit.co/api/session-context?project_id=${encodeURIComponent(project_id)}`,
+        { headers: { Accept: "application/json" }, signal: controller.signal }
+      );
     } catch {
-      // Network error or timeout — exit silently
       process.exit(0);
     } finally {
       clearTimeout(timeout);
     }
 
-    // 3. Handle response
     if (response.status === 401) {
       writeOutput({
         additionalContext:
@@ -69,10 +57,7 @@ async function main() {
       return;
     }
 
-    if (!response.ok) {
-      // Non-200, non-401 — exit silently
-      process.exit(0);
-    }
+    if (!response.ok) process.exit(0);
 
     let data;
     try {
@@ -82,15 +67,18 @@ async function main() {
     }
 
     const contextText = data && data.context_text;
-    if (!contextText) {
-      process.exit(0);
-    }
+    if (!contextText) process.exit(0);
+
+    // Truncate oversized responses to protect context window
+    const MAX_LENGTH = 256 * 1024;
+    const text = contextText.length > MAX_LENGTH
+      ? contextText.slice(0, MAX_LENGTH) + "\n[... truncated at 256 KB]"
+      : contextText;
 
     writeOutput({
-      additionalContext: `=== VALIS TEAM DECISIONS (read-only context) ===\n${contextText}\n=== END VALIS CONTEXT ===`,
+      additionalContext: `=== VALIS TEAM DECISIONS (read-only context) ===\n${text}\n=== END VALIS CONTEXT ===`,
     });
   } catch {
-    // Catch-all: never crash
     process.exit(0);
   }
 }
@@ -98,7 +86,5 @@ async function main() {
 function writeOutput(obj) {
   try {
     process.stdout.write(JSON.stringify(obj) + "\n");
-  } catch {
-    // ignore write errors
-  }
+  } catch { /* ignore */ }
 }

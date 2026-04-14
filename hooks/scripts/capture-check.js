@@ -2,14 +2,9 @@
 "use strict";
 
 /**
- * Valis PostToolUse hook — periodic capture reminder
- *
- * Maintains a counter in CLAUDE_PLUGIN_DATA/capture-state.json.
- * Every 5th tool invocation, injects a gentle reminder to search/store
- * team decisions via Valis.
- *
- * Pure Node.js — zero external dependencies.
- * Non-firing calls complete in <5ms (no async, no I/O beyond a tiny JSON file).
+ * Valis PostToolUse hook — periodic capture reminder.
+ * Every 5th tool call, reminds the agent to search/store team decisions.
+ * Pure Node.js, zero dependencies.
  */
 
 // Drain stdin (hook protocol)
@@ -24,17 +19,14 @@ function run() {
     const path = require("path");
 
     const dataDir = process.env.CLAUDE_PLUGIN_DATA;
-    if (!dataDir) {
-      process.exit(0);
-    }
+    if (!dataDir) process.exit(0);
 
     const statePath = path.join(dataDir, "capture-state.json");
 
     // Read current count
     let count = 0;
     try {
-      const raw = fs.readFileSync(statePath, "utf8");
-      const state = JSON.parse(raw);
+      const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
       if (typeof state.count === "number" && Number.isFinite(state.count)) {
         count = state.count;
       }
@@ -42,33 +34,26 @@ function run() {
       // File missing or corrupt — start from 0
     }
 
-    // Increment
-    count += 1;
+    count = (count % 1_000_000) + 1;
 
-    // Write back (ensure directory exists)
+    // Write back
     try {
       fs.mkdirSync(dataDir, { recursive: true });
-    } catch {
-      // directory likely already exists
-    }
+    } catch { /* already exists */ }
     fs.writeFileSync(statePath, JSON.stringify({ count }), "utf8");
 
     // Every 5th call — emit reminder
     if (count % 5 === 0) {
-      const msg = {
-        additionalContext:
-          "Valis periodic check: Before making architectural or technical decisions \u2014 call valis_search to check existing team knowledge. After decisions are made \u2014 store each one separately via valis_store (one decision per call, never batch multiple decisions into one store call). Types: decision, constraint, pattern, lesson. Always include summary (max 100 chars) and affects.",
-      };
       try {
-        process.stdout.write(JSON.stringify(msg) + "\n");
-      } catch {
-        // ignore
-      }
+        process.stdout.write(JSON.stringify({
+          additionalContext:
+            "Valis reminder: search valis_search before decisions, store each via valis_store (one per call, include summary + affects).",
+        }) + "\n");
+      } catch { /* ignore */ }
     }
 
     process.exit(0);
   } catch {
-    // Catch-all: never crash
     process.exit(0);
   }
 }
