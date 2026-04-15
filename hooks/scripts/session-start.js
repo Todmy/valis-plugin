@@ -9,6 +9,8 @@
  * Pure Node.js — zero external dependencies.
  */
 
+const { API_BASE_URL, TIMEOUTS, loadConfig, writeOutput } = require("./lib/config.js");
+
 // Drain stdin (hook protocol)
 process.stdin.resume();
 process.stdin.on("data", () => {});
@@ -17,30 +19,20 @@ process.stdin.on("error", () => process.exit(0));
 
 async function main() {
   try {
-    const fs = require("fs");
-    const path = require("path");
-
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    const configPath = path.join(projectDir, ".valis.json");
-
-    let config;
-    try {
-      config = JSON.parse(fs.readFileSync(configPath, "utf8"));
-    } catch {
-      process.exit(0);
-    }
+    const config = loadConfig();
+    if (!config) process.exit(0);
 
     const { project_id } = config;
     if (!project_id) process.exit(0);
 
-    // Fetch session context with 5s timeout
+    // Fetch session context with configurable timeout
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), TIMEOUTS.api);
 
     let response;
     try {
       response = await fetch(
-        `https://valis.krukit.co/api/session-context?project_id=${encodeURIComponent(project_id)}`,
+        `${API_BASE_URL}/api/session-context?project_id=${encodeURIComponent(project_id)}`,
         { headers: { Accept: "application/json" }, signal: controller.signal }
       );
     } catch {
@@ -81,10 +73,4 @@ async function main() {
   } catch {
     process.exit(0);
   }
-}
-
-function writeOutput(obj) {
-  try {
-    process.stdout.write(JSON.stringify(obj) + "\n");
-  } catch { /* ignore */ }
 }
