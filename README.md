@@ -70,9 +70,10 @@ Override defaults via environment variables:
 ## Links
 
 - [Valis Dashboard](https://valis.krukit.co)
-- [Documentation](https://valis.krukit.co/docs)
-- [GitHub (main repo)](https://github.com/Todmy/valis)
+- [Report an issue](https://github.com/Todmy/valis-plugin/issues)
 
 ## License
 
-Apache-2.0
+Proprietary — source available for audit under the [Valis Plugin EULA](./LICENSE).
+
+This plugin is a thin client for the hosted Valis service at [valis.krukit.co](https://valis.krukit.co). Installation and use require a valid Valis account. See the [LICENSE](./LICENSE) file for full terms.

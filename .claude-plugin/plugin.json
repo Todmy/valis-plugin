@@ -8,7 +8,7 @@
   },
   "homepage": "https://valis.krukit.co",
   "repository": "https://github.com/Todmy/valis-plugin",
-  "license": "Apache-2.0",
+  "license": "LicenseRef-Valis-EULA-1.0",
   "keywords": [
     "team-knowledge",
     "architectural-decisions",
