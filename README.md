@@ -14,7 +14,7 @@ Valis keeps your team's architectural decisions, constraints, and patterns in a 
 
 - **SessionStart hook** — loads recent team decisions into every session
 - **Periodic nudge** — reminds the agent to search before deciding, store after deciding
-- **7 slash commands** — guided workflows for common operations
+- **8 slash commands** — guided workflows for common operations
 
 ## Commands
 
