@@ -19,12 +19,28 @@ Connect this repository to a Valis project by creating `.valis.json`.
 
 5. **If user picks "Create a new project"** (or equivalent):
    - Ask for the project name. Suggest the current repo directory basename as a default.
-   - Call the **`valis_create_project`** MCP tool with `project_name`. It returns `{ project_id, project_name, role }`.
-   - Treat the response as the selected project for step 6.
+   - **Show the baseline picker** — present these four options as a numbered menu and ask the user to pick one:
+
+     ```
+     1. Blank — start empty (0 decisions)
+     2. ts-saas v0.1 — TypeScript SaaS conventions (18 decisions, free plan)
+     3. fintech v0.1 — Fintech compliance + auditability (22 decisions, requires 'pro' plan or higher)
+     4. ai-agent v0.1 — AI agent / LLM app conventions (15 decisions, free plan)
+     ```
+
+     The version labels (`v0.1`) come from the registry — keep them visible so the user knows which snapshot will be seeded if they audit the project later.
+
+   - Call **`valis_create_project`**:
+     - For Blank: pass `project_name` only.
+     - For a template: pass `project_name` AND `template_id` (one of `ts-saas` | `fintech` | `ai-agent`).
+   - On success the response includes `{ project_id, project_name, role, template_source, decisions_seeded }`. Surface `decisions_seeded` to the user so they know how much was preloaded.
+   - **Plan-locked errors**: if the response has `error: 'plan_too_low'`, surface the human-readable `message` to the user and offer to retry with a different template (Blank or another free-tier option). Do not retry blindly.
+   - **Quota errors**: if the response has `error: 'plan_quota_exceeded'`, surface the message and offer Blank as a fallback (no decisions seeded).
+   - Treat the successful response as the selected project for step 6.
 
 6. Write `.valis.json` to the repo root:
    ```json
    { "project_id": "<id>", "project_name": "<name>" }
    ```
 
-7. Print: "Connected to {project_name}. {decision_count} decisions available." (use 0 for newly created projects).
+7. Print: "Connected to {project_name}. {decision_count} decisions available." Substitute `decisions_seeded` for templated projects, or 0 for blank ones.
