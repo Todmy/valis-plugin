@@ -25,6 +25,7 @@ Valis keeps your team's architectural decisions, constraints, and patterns in a 
 | `/valis:store` | Store a decision with guided classification |
 | `/valis:search` | Search team knowledge base |
 | `/valis:before-task` | Load relevant context before starting work |
+| `/valis:check` | Run the team's enforcement check against your working-tree diff before committing |
 | `/valis:extract` | Extract decisions from a folder of documents |
 | `/valis:add-command` | Create a KB-backed persona command |
 | `/valis:lifecycle` | Promote, deprecate, or supersede decisions |
