@@ -3,7 +3,8 @@
 Capture, search, and enforce architectural decisions across AI coding sessions.
 
 ```
-/plugin install valis
+/plugin marketplace add Todmy/valis-plugin
+/plugin install valis@valis-plugin
 ```
 
 That's it. OAuth login happens automatically on first use.
@@ -35,8 +36,9 @@ Valis keeps your team's architectural decisions, constraints, and patterns in a 
 ### New project (owner)
 
 ```
-/plugin install valis        # install plugin
-/valis:init                  # pick your project
+/plugin marketplace add Todmy/valis-plugin
+/plugin install valis@valis-plugin
+/valis:init                  # pick or create your project
 git add .valis.json && git commit -m "add valis config"
 ```
 
@@ -44,7 +46,8 @@ git add .valis.json && git commit -m "add valis config"
 
 ```
 git clone <repo>             # .valis.json already in repo
-/plugin install valis        # install plugin, OAuth on first use
+/plugin marketplace add Todmy/valis-plugin
+/plugin install valis@valis-plugin   # OAuth on first use
 ```
 
 Done. Team decisions load automatically.

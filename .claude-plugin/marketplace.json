@@ -1,0 +1,20 @@
+{
+  "name": "valis-plugin",
+  "owner": {
+    "name": "Dmytro Tolok",
+    "email": "dmytro@krukit.co"
+  },
+  "metadata": {
+    "description": "Decision intelligence for dev teams — capture, search, and enforce architectural decisions across AI coding sessions",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "valis",
+      "source": "./",
+      "description": "Capture, search, and enforce architectural decisions across Claude Code sessions. Remote MCP via OAuth 2.1, 9 slash commands, 3 hooks (SessionStart context, periodic capture nudge, PreCompact save).",
+      "version": "0.1.0",
+      "strict": true
+    }
+  ]
+}
