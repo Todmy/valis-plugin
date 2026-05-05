@@ -31,6 +31,25 @@ Valis keeps your team's architectural decisions, constraints, and patterns in a 
 | `/valis:add-command` | Create a KB-backed persona command |
 | `/valis:lifecycle` | Promote, deprecate, or supersede decisions |
 
+## Cross-harness skills (claude.ai web, Cursor, Codex, Gemini CLI, Goose, OpenCode)
+
+The slash commands above are Claude Code-specific. For other harnesses,
+the same workflows ship as AAIF SKILL.md files in `skills/valis/`. They
+work in any runtime that honors the AAIF spec — including claude.ai web
+via the `/skill-creator` flow.
+
+| Skill | Purpose |
+|---|---|
+| `valis-capture` | Dedup-check + store an architectural decision |
+| `valis-find` | Surface existing precedent before adding a new pattern |
+| `valis-check` | Shift-left enforcement against working-tree diff |
+| `valis-import` | Bulk-import a folder of architectural notes |
+| `valis-triage` | Walk the proposals queue; promote or dismiss |
+| `valis-recall` | Search across all accessible projects (catches silent miss) |
+| `valis-ci` | Set up GitHub Actions for PR-time enforcement |
+
+See `skills/valis/README.md` for setup per harness.
+
 ## Setup
 
 ### New project (owner)
