@@ -2,12 +2,11 @@
 "use strict";
 
 /**
- * PreCompact hook (plugin path).
+ * Stop hook (plugin path).
  *
  * Phase A: silent-skip stub. Delegates to the CLI's silent-skip stub.
- * Activates only when Phase B FR-042 telemetry triggers ship the real
- * implementation in a future drop.
+ * Activates only if Phase B FR-042 telemetry triggers (Stop knowledge sweep).
  */
 
 const { delegate } = require("./lib/delegate.js");
-delegate("pre-compact");
+delegate("stop");
