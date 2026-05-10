@@ -71,6 +71,27 @@ git clone <repo>             # .valis.json already in repo
 
 Done. Team decisions load automatically.
 
+### Updating an existing install
+
+Claude Code marketplaces do **not** auto-pull from upstream. To get newer plugin features (delegator pattern, new hooks, slash commands), update the marketplace clone explicitly:
+
+```
+/plugin marketplace update valis-plugin
+```
+
+If the slash command is unavailable in your CC version, fall back to git:
+
+```bash
+git -C ~/.claude/plugins/marketplaces/valis-plugin pull --ff-only origin main
+rsync -a --exclude='.git' \
+  ~/.claude/plugins/marketplaces/valis-plugin/ \
+  ~/.claude/plugins/cache/valis-plugin/valis/0.1.0/
+```
+
+The cache copy is what Claude Code executes at runtime; both must be in sync. Restart Claude Code after updating.
+
+**Why this matters**: feature releases that depend on plugin commits (e.g., self-heal in CLI 0.2.0 requires the plugin's delegator from commit `1379f95`+) will silently no-op for users on stale installs. If you upgrade `valis-cli` but skip the plugin update, you get partial functionality.
+
 ## How it works
 
 - **Remote MCP server** at `valis.krukit.co/api/mcp` — no CLI installation needed
